@@ -1,0 +1,26 @@
+Package: gradientHW
+Type: Package
+Title: Gradient Metric homework assignment on market research
+Version: 0.1.0
+Author: Tahmidul Islam
+Maintainer: Tahmidul Islam <tahmidstat@gmail.com>
+Description: Gradient Metric homework assignment completed by Tahmidul Islam. 
+This assignment deals with experiment data obtained to explore what message should
+be shown for optimizing the likelihood of downloading the sleep helper app. It 
+also includes a descriptive analysis of a survey data of the respondents.
+License: NA
+Encoding: UTF-8
+LazyData: true
+Depends: 
+        dplyr, 
+        purrr, 
+        radiant, 
+        ggfortify, 
+        factoextra,
+        tibble,
+        kableExtra,
+        sjlabelled
+VignetteBuilder: 
+    knitr
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1    

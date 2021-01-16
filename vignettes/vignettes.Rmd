@@ -1,0 +1,390 @@
+---
+title: "Gradient Metrics Homework"
+author: "<strong>Tahmidul Islam</strong>" #
+date: '<i>`r format(Sys.Date(), "%B %d, %Y")`</i>'
+output: 
+  html_document:
+    theme: sandstone            # Keep this theme - our custom CSS is build upon it
+    highlight: tango            # Keep this theme - our custom CSS is build upon it
+    keep_md: false              # FALSE if you don't want a MD copy
+    code_folding: show          # Makes your code chunks foldable. Delete if you don't want that.
+    toc: TRUE                   # FALSE if you don't want a TOC
+    toc_depth: 3                # Depth of the TOC
+vignette: >
+  %\VignetteIndexEntry{Gradient Metric Marker Analysis Homework}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+
+```{css, echo = FALSE}
+pre {
+  max-height: 300px;
+  float: left;
+  width: 910px;
+  overflow-y: auto;
+}
+
+pre.r {
+  max-height: none;
+}
+```
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+library(knitr)
+opts_chunk$set(
+	comment = "",
+	#fig.width = 12, 
+	message = FALSE,
+	warning = FALSE,
+	tidy.opts = list(
+		keep.blank.line = TRUE,
+		width.cutoff = 150
+		),
+	options(width = 150),
+	eval = TRUE,
+	echo = TRUE,
+	fig.height =6,
+	fig.width = 8,
+	fig.align = "left"
+)
+# print head
+# don't print long-lines
+```
+
+
+
+# Introduction
+
+This assignment is aimed at replicating a real world marketing research solution where the client wants structure their marketing message in the best possible way to maximize the popularity of their app which helps people sleep better. The objectives of this analysis are:
+
+* **Primary**: Investigate how each attribute (and level) influences the overall likeliness to download using an experiment dataset 
+
+* **Secondary**:  Descriptive analysis of the demographic, psychological and behavioral data of the groups of respondents using a survey dataset
+
+# What Message Should be Sent?
+
+The experiment dataset provides 6 attributes considered in the message testing at the experiment. Let's load the data and have a glimpse at it.
+
+```{r}
+library(gradientHW)
+head(experiment_data) %>% kable() %>% kable_styling()
+```
+
+Now we explore the possible levels of the attributes.
+
+```{r}
+experiment_data %>%
+  select(duration:social_proof) %>%
+  map(unique) %>% 
+  map(~t(t(.x)))
+```
+
+
+For each combination of these levels, the responders rated how much they would like to download the app. These answers can be found in the `answer' column:
+
+- 1 - Very unlikely 
+- 2 - Somewhat unlikely 
+- 3 - Somewhat likely 
+- 4 - Very likely
+
+Note that, the message testing experiment is a ratings-based conjoint on an ordinal scale. Naturally we approach the problem with the conjoint analysis tool. Conjoint analysis helps us to identify important factors and contribution of levels of those factors when a survey is performed about product preference. We can utilize the excellent R package `Radiant' (https://radiant-rstats.github.io/docs) for this task.
+
+First, we modify our data a little to make it more friendly for the conjoint analysis.
+
+```{r}
+experiment_data <- experiment_data %>% 
+  mutate_if(is.character,as.factor) %>% #Transforming the character variable to factor variables
+  select(-task) #remove the task variable
+```
+
+
+The Radiant package allows us to estimate the `Parts-Worth' (PW) model directly. 
+
+```{r}
+conjoint_allrespondents <- conjoint(experiment_data, rvar = "answer",  
+                                    evar = names(experiment_data)[2:7]) 
+summary(conjoint_allrespondents) 
+```
+The output gives *part-worths*, *importance weights*, and *regression coefficients*. The part-worths and the regression coefficients give the same information: compared to the reference level (the first level of an attribute, the part-worths are always zero). It is easier to understand the results with the plots. Let's inspect the part-worths (the contribution of the level of the factors).
+
+```{r, 	fig.height = 12,	fig.width = 11}
+plot(conjoint_allrespondents,plots = "pw")
+```
+
+Using these part-worths it is easy to construct the most desirable combination of messages:
+
+* Duration: "3 months"
+* Offer: "improve your sleep sustainably"
+* Outcome: "breaking bad habits and creating new routines"
+* Price: "$20/month"
+* rtb: "a program created just for you" 
+* Social proof: "a method that has helped thousands" or "scientific evidence"
+
+In essence, the responders are more likely to download the app if combination of these messages are displayed. We can also find out which attribute has the most effect on the decision of the responders.
+
+```{r}
+plot(conjoint_allrespondents,plots = "iw")
+```
+
+Clearly the price has the most influence over respondent's will to download the app while the duration has the least effect. The other four attributes have somewhat similar contribution to the responses. 
+
+
+
+
+
+# Who Are Getting These Messages?
+
+The survey data provides a broad overview of the characteristics and behavior of the respondents. The survey data has several components:
+
+* Demographic
+* Psychological 
+* Behavioral 
+
+To understand the user group, we take the descriptive statistics route and see who are actually going to receive these messages (assuming we have a representative sample of the receiver population).
+
+First we load the survey data and take a glance.
+
+```{r}
+head(survey_data)  %>% kable() %>% kable_styling(bootstrap_options = c("striped"), full_width = T, font_size = 11) %>%  scroll_box(height = "300px") 
+```
+## Demographics
+
+The variables are coded so it will be helpful to look at the variables, the levels and the coding.
+```{r}
+survey_demo <- survey_data %>%
+  select(response_id, d_urban:s_problem, d_marital:weights) 
+
+survey_demo %>%  
+  select(-response_id, -weights) %>% 
+  map(unique)
+```
+It always easier to explore the data with plots and charts. From the plots below we can get an overview of the respondents; for example there are almost same number of male and female in the survey, mostly from midwest and southern region. 
+```{r, 	fig.height = 8,	fig.width = 11}
+survey_demo %>% select(-response_id, -weights) %>% 
+  mutate_all(as_factor) %>% 
+  gather() %>% 
+  drop_na() %>% 
+  ggplot(aes(value)) +
+  facet_wrap(~key, scale = 'free') +
+  geom_bar()
+```
+
+Age distribution is also balanced with ranging from 18 to 65+ years with slightly more people with age between 31 to 64 years. Most of the respondents are from urban/suburban areas with atleast some high school level education. The respondents are mainly employed or retired from diverse household income groups. Most of them are married.
+
+Interesting fact is learned when they are asked the how often would they have trouble sleeping at night during a typical week (e.g., falling asleep, staying asleep, getting good quality sleep). None of the subject replied "Never" or "Rarely". Most of the respondents replied they experience sleep trouble at least two nights a week. It appears that an app for helping people to sleep will be useful to many.
+
+
+Many other aspects were interviewed as well. The questions and the responses are summarized here.
+
+## Personal philosophy on Science, Products and Health
+
+
+```{r}
+survey_philosophy <-
+  survey_data %>%
+  select(response_id, contains('m1_philosophy'))
+
+survey_philosophy %>%  
+  select(-response_id) %>% 
+  map(unique) 
+```
+
+```{r}
+survey_philosophy %>% select(-response_id) %>% 
+  mutate_all(as_factor) %>% 
+  gather() %>% 
+  drop_na() %>% 
+  ggplot(aes(value)) +
+  facet_wrap(~key, scale = 'free') +
+  geom_bar()
+```
+
+
+## Attitudes & Awareness towards statements related to sleep 
+```{r}
+survey_awareness <-
+  survey_data %>%
+  select(response_id, contains('m2_awareness'))
+
+survey_awareness %>%  
+  select(-response_id) %>% 
+  mutate_all(as_factor) %>%
+  label_to_colnames() %>% 
+  names()
+```
+
+```{r}
+survey_awareness %>% 
+  mutate_all(as_factor) %>% 
+  pivot_longer(cols = -response_id,names_to = 'app', values_to = 'response') %>% 
+  select(-response_id) %>% 
+  mutate_all(as_factor) %>% 
+  drop_na() %>% 
+  count(app) %>% 
+  ggplot(aes(x = reorder(app, -n), y = n)) + geom_col()
+```
+
+
+## Sources of trouble with sleeping at night and any actions taken to improve the quality of sleep
+```{r}
+survey_source <-
+  survey_data %>%
+  select(response_id, contains('source'))
+
+survey_source %>%  
+  select(-response_id) %>% 
+  mutate_all(as_factor) %>%
+  label_to_colnames() %>% 
+  names()
+```
+```{r}
+survey_source %>% 
+  mutate_all(as_factor) %>% 
+  pivot_longer(cols = -response_id,names_to = 'source', values_to = 'response') %>% 
+  select(-response_id) %>% 
+  drop_na() %>% 
+  count(source) %>% 
+  ggplot(aes(x = reorder(source, -n), y = n)) + geom_col()
+```
+
+## Behavioral questions
+
+```{r}
+survey_behavior <-
+  survey_data %>%
+  select(response_id, contains('behavior'))
+
+survey_behavior %>%  
+  select(-response_id) %>% 
+  mutate_all(as_factor) %>%
+  label_to_colnames() %>% 
+  names()
+```
+
+```{r}
+survey_behavior %>% 
+  mutate_all(as_factor) %>% 
+  pivot_longer(cols = -response_id,names_to = 'behavior', values_to = 'response') %>% 
+  select(-response_id) %>% 
+  mutate_all(as_factor) %>% 
+  drop_na() %>% 
+  count(behavior) %>% 
+  ggplot(aes(x = reorder(behavior, -n), y = n)) + geom_col()
+```
+
+## Other questions
+
+```{r}
+survey_other <-
+  survey_data %>%
+  select(response_id, interst_cbt:interest_coach)
+
+survey_other %>%  
+  select(-response_id) %>% 
+  map(unique)
+```
+
+```{r}
+survey_other %>% select(-response_id) %>% 
+  mutate_all(as_factor) %>% 
+  gather() %>% 
+  drop_na() %>% 
+  ggplot(aes(value)) +
+  facet_wrap(~key, scale = 'free') +
+  geom_bar()
+```
+
+# Market Segmentation
+
+The survey collected data on almost 100 variables. It is very difficult to understand the characteristics of the potential consumers by looking at all these variables all together. Thus a dimension reduction technique is needed to visualize and capture the spread and influence of these attributes. Principal component analysis (PCA) is a widely used statistical tool for dimension reduction. We employ PCA on the survey data.
+
+```{r}
+set.seed(2021)
+
+pca_data <- survey_data %>% 
+  select(-response_id, -weights) %>% 
+  mutate(s_region = case_when(
+    s_region == 'MIDWEST' ~ 0,
+    s_region == 'NORTHEAST' ~ 1,
+    s_region == 'SOUTH' ~ 2,
+    s_region == 'WEST' ~ 3
+  )) %>% 
+  mutate(across(everything(), ~replace_na(.x, 0))) %>% 
+  mutate_all(as_numeric)
+
+pca <- prcomp(pca_data, center = T)  #principle component analysis
+fviz_eig(pca)
+```
+
+From the PCA result, it doesn't look promising since the principal components (PC) have very little explanation power, i.e. not much dimension reduction is possible. Nevertheless, let's take look at the first two PC.
+```{r}
+autoplot(pca)
+```
+
+Using PC, it is hard to segment the respondents in nice separable groups. Therefore, we take help from the hierarchical cluster analysis to investigate wether we can divide the respondents based on their answers of the survey questions.
+
+```{r}
+dist <- dist(pca_data, method = "euclidean")
+hc <- hclust(dist, method = "complete")
+fviz_dend(hc, show_labels = FALSE, main = "Uncut Dendrogram")
+```
+
+From the dendogram we can decide to cut the trees at the height of 18 to get some reasonable number of clusters. 
+
+```{r}
+cluster_assign <- cutree(hc, h = 18)
+table(cluster_assign)
+```
+
+
+Cutting the tree at 18 gives us 6 total clusters but there are few clusters with very few observation. So we reduce the number of clusters to 4.
+
+```{r}
+fviz_dend(hc, 
+          k = 4,
+          show_labels = FALSE,
+          rect = TRUE,
+          rect_fill = TRUE,
+          main = "Four cluster Dendrogram")
+```
+
+Using the selected number of clusters, we proceed to the final cluster analysis using the k-means clustering with k = 4.
+
+```{r}
+kCluster <- kmeans(pca_data, 4)
+pca_data <- mutate(fortify(pca), col=kCluster$cluster) 
+
+ggplot(pca_data) +  
+  geom_point(aes(x=PC1, y=PC2, fill=factor(col)), size=3, col="#7f7f7f", shape=21) 
+
+survey_data <- survey_data %>% mutate(cluster = kCluster$cluster)
+```
+Even with four clusters, it is visible that there are many overlapping groups of subjects. It is not expected that the cluster analysis will be able to segment the market effectively. However, we continue with these four clusters and check the demographics of these clusters.
+
+```{r}
+survey_demo <- survey_data %>%
+  select(response_id, d_urban:s_problem, d_marital:weights, cluster) 
+
+
+survey_demo %>% select(-weights) %>% 
+  mutate_all(as_factor) %>% 
+  pivot_longer(cols = -c(response_id,cluster) ,names_to = 'key', 
+               values_to = 'value') %>% 
+  drop_na() %>% 
+  ggplot(aes(value, fill = cluster)) +
+  facet_wrap(~key, scale = 'free') +
+  geom_bar(position = position_fill())
+```
+
+From the demographic distribution of the respondents by their cluster identity it appears that the following factors supply useful distinguishing features to segment the market:
+
+1. The number of infant children
+2. Education
+3. Employment 
+4. Marital status
+5. Age 
+
+
+
+
