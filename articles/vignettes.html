@@ -76,7 +76,7 @@
       <h1 data-toc-skip>Gradient Metrics Homework</h1>
                         <h4 class="author"><strong>Tahmidul Islam</strong></h4>
             
-            <h4 class="date"><i>January 16, 2021</i></h4>
+            <h4 class="date"><i>January 17, 2021</i></h4>
       
       
       <div class="hidden name"><code>vignettes.Rmd</code></div>
@@ -111,7 +111,9 @@ pre.r {
 <a href="#what-message-should-be-sent" class="anchor"></a>What Message Should be Sent?</h1>
 <p>The experiment dataset provides 6 attributes considered in the message testing at the experiment. Let’s load the data and have a glimpse at it.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">gradientHW</span><span class="op">)</span>
+<code class="sourceCode R"><span class="co"># load the R package containing the whole analysis and dataset</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">gradientHW</span><span class="op">)</span>
+<span class="co"># overview of the experiment data</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">experiment_data</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">kable</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">kable_styling</span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <table class="table table">
 <thead><tr>
@@ -322,7 +324,8 @@ scientific evidence
 </table>
 <p>Now we explore the possible levels of the attributes.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">experiment_data</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="co"># attributes and levels in experiment data</span>
+<span class="va">experiment_data</span> <span class="op">%&gt;%</span>
   <span class="fu">select</span><span class="op">(</span><span class="va">duration</span><span class="op">:</span><span class="va">social_proof</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu">map</span><span class="op">(</span><span class="va">unique</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">map</span><span class="op">(</span><span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html">t</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -382,7 +385,8 @@ $social_proof
   <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">task</span><span class="op">)</span> <span class="co">#remove the task variable</span></code></pre></div>
 <p>The Radiant package allows us to estimate the `Parts-Worth’ (PW) model directly.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">conjoint_allrespondents</span> <span class="op">&lt;-</span> <span class="fu">conjoint</span><span class="op">(</span><span class="va">experiment_data</span>, rvar <span class="op">=</span> <span class="st">"answer"</span>,  
+<code class="sourceCode R"><span class="co"># conjoint analysis using Radiant package</span>
+<span class="va">conjoint_allrespondents</span> <span class="op">&lt;-</span> <span class="fu">conjoint</span><span class="op">(</span><span class="va">experiment_data</span>, rvar <span class="op">=</span> <span class="st">"answer"</span>,  
                                     evar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">experiment_data</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">7</span><span class="op">]</span><span class="op">)</span> 
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">conjoint_allrespondents</span><span class="op">)</span> </code></pre></div>
 <pre><code>Conjoint analysis
@@ -451,7 +455,8 @@ Conjoint regression results:
  social_proof|scientific evidence                             0.069</code></pre>
 <p>The output gives <em>part-worths</em>, <em>importance weights</em>, and <em>regression coefficients</em>. The part-worths and the regression coefficients give the same information: compared to the reference level (the first level of an attribute, the part-worths are always zero). It is easier to understand the results with the plots. Let’s inspect the part-worths (the contribution of the level of the factors).</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">conjoint_allrespondents</span>,plots <span class="op">=</span> <span class="st">"pw"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="co">#plotting part-worths</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">conjoint_allrespondents</span>,plots <span class="op">=</span> <span class="st">"pw"</span><span class="op">)</span></code></pre></div>
 <p><img src="vignettes_files/figure-html/unnamed-chunk-7-1.png" width="1056" style="display: block; margin: auto auto auto 0;"></p>
 <p>Using these part-worths it is easy to construct the most desirable combination of messages:</p>
 <ul>
@@ -464,7 +469,8 @@ Conjoint regression results:
 </ul>
 <p>In essence, the responders are more likely to download the app if combination of these messages are displayed. We can also find out which attribute has the most effect on the decision of the responders.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">conjoint_allrespondents</span>,plots <span class="op">=</span> <span class="st">"iw"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="co">#plotting importance weights</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">conjoint_allrespondents</span>,plots <span class="op">=</span> <span class="st">"iw"</span><span class="op">)</span></code></pre></div>
 <p><img src="vignettes_files/figure-html/unnamed-chunk-8-1.png" width="768" style="display: block; margin: auto auto auto 0;"></p>
 <p>Clearly the price has the most influence over respondent’s will to download the app while the duration has the least effect. The other four attributes have somewhat similar contribution to the responses.</p>
 </div>
@@ -480,7 +486,8 @@ Conjoint regression results:
 <p>To understand the user group, we take the descriptive statistics route and see who are actually going to receive these messages (assuming we have a representative sample of the receiver population).</p>
 <p>First we load the survey data and take a glance.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">)</span>  <span class="op">%&gt;%</span> <span class="fu">kable</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">kable_styling</span><span class="op">(</span>bootstrap_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"striped"</span><span class="op">)</span>, full_width <span class="op">=</span> <span class="cn">T</span>, font_size <span class="op">=</span> <span class="fl">11</span><span class="op">)</span> <span class="op">%&gt;%</span>  <span class="fu">scroll_box</span><span class="op">(</span>height <span class="op">=</span> <span class="st">"300px"</span><span class="op">)</span> </code></pre></div>
+<code class="sourceCode R"><span class="co"># survey data</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">survey_data</span><span class="op">)</span>  <span class="op">%&gt;%</span> <span class="fu">kable</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">kable_styling</span><span class="op">(</span>bootstrap_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"striped"</span><span class="op">)</span>, full_width <span class="op">=</span> <span class="cn">T</span>, font_size <span class="op">=</span> <span class="fl">11</span><span class="op">)</span> <span class="op">%&gt;%</span>  <span class="fu">scroll_box</span><span class="op">(</span>height <span class="op">=</span> <span class="st">"300px"</span><span class="op">)</span> </code></pre></div>
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:300px; ">
 <table class="table table table-striped">
 <thead><tr>
@@ -2606,9 +2613,10 @@ SOUTH
 <a href="#demographics" class="anchor"></a>Demographics</h2>
 <p>The variables are coded so it will be helpful to look at the variables, the levels and the coding.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">survey_demo</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="co"># subsetting demographic variables</span>
+<span class="va">survey_demo</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op">%&gt;%</span>
   <span class="fu">select</span><span class="op">(</span><span class="va">response_id</span>, <span class="va">d_urban</span><span class="op">:</span><span class="va">s_problem</span>, <span class="va">d_marital</span><span class="op">:</span><span class="va">weights</span><span class="op">)</span> 
-
+<span class="co"># variables and levels</span>
 <span class="va">survey_demo</span> <span class="op">%&gt;%</span>  
   <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">response_id</span>, <span class="op">-</span><span class="va">weights</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">map</span><span class="op">(</span><span class="va">unique</span><span class="op">)</span></code></pre></div>
@@ -2818,7 +2826,8 @@ $s_age
 [1] "65+"   "46-64" "31-45" "18-30"</code></pre>
 <p>It always easier to explore the data with plots and charts. From the plots below we can get an overview of the respondents; for example there are almost same number of male and female in the survey, mostly from midwest and southern region.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">survey_demo</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">response_id</span>, <span class="op">-</span><span class="va">weights</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+<code class="sourceCode R"><span class="co"># barplot of the demographic variables</span>
+<span class="va">survey_demo</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">response_id</span>, <span class="op">-</span><span class="va">weights</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate_all</span><span class="op">(</span><span class="va">as_factor</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">gather</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">drop_na</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -2834,10 +2843,11 @@ $s_age
 <h2 class="hasAnchor">
 <a href="#personal-philosophy-on-science-products-and-health" class="anchor"></a>Personal philosophy on Science, Products and Health</h2>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">survey_philosophy</span> <span class="op">&lt;-</span>
+<code class="sourceCode R"><span class="co"># subsetting the philosophy questions</span>
+<span class="va">survey_philosophy</span> <span class="op">&lt;-</span>
   <span class="va">survey_data</span> <span class="op">%&gt;%</span>
   <span class="fu">select</span><span class="op">(</span><span class="va">response_id</span>, <span class="fu">contains</span><span class="op">(</span><span class="st">'m1_philosophy'</span><span class="op">)</span><span class="op">)</span>
-
+<span class="co"># attribtutes and levels</span>
 <span class="va">survey_philosophy</span> <span class="op">%&gt;%</span>  
   <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">response_id</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">map</span><span class="op">(</span><span class="va">unique</span><span class="op">)</span> </code></pre></div>
@@ -2949,7 +2959,8 @@ Labels:
      4            Somewhat agree
      5            Strongly agree</code></pre>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">survey_philosophy</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">response_id</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+<code class="sourceCode R"><span class="co"># plotting philosophy data</span>
+<span class="va">survey_philosophy</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">response_id</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate_all</span><span class="op">(</span><span class="va">as_factor</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">gather</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">drop_na</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -2962,10 +2973,11 @@ Labels:
 <h2 class="hasAnchor">
 <a href="#attitudes-awareness-towards-statements-related-to-sleep" class="anchor"></a>Attitudes &amp; Awareness towards statements related to sleep</h2>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">survey_awareness</span> <span class="op">&lt;-</span>
+<code class="sourceCode R"><span class="co"># subsetting awareness variables</span>
+<span class="va">survey_awareness</span> <span class="op">&lt;-</span>
   <span class="va">survey_data</span> <span class="op">%&gt;%</span>
   <span class="fu">select</span><span class="op">(</span><span class="va">response_id</span>, <span class="fu">contains</span><span class="op">(</span><span class="st">'m2_awareness'</span><span class="op">)</span><span class="op">)</span>
-
+<span class="co"># attributes and levels</span>
 <span class="va">survey_awareness</span> <span class="op">%&gt;%</span>  
   <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">response_id</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate_all</span><span class="op">(</span><span class="va">as_factor</span><span class="op">)</span> <span class="op">%&gt;%</span>
@@ -2984,7 +2996,8 @@ Labels:
 [11] "Please select all of the health-focused applications/products that you have heard about. Sleepio"                                                  
 [12] "Please select all of the health-focused applications/products that you have heard about. Not applicable, I have not heard of any of these products"</code></pre>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">survey_awareness</span> <span class="op">%&gt;%</span> 
+<code class="sourceCode R"><span class="co"># plotting awareness variables</span>
+<span class="va">survey_awareness</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate_all</span><span class="op">(</span><span class="va">as_factor</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">pivot_longer</span><span class="op">(</span>cols <span class="op">=</span> <span class="op">-</span><span class="va">response_id</span>,names_to <span class="op">=</span> <span class="st">'app'</span>, values_to <span class="op">=</span> <span class="st">'response'</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">response_id</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -2998,7 +3011,8 @@ Labels:
 <h2 class="hasAnchor">
 <a href="#sources-of-trouble-with-sleeping-at-night-and-any-actions-taken-to-improve-the-quality-of-sleep" class="anchor"></a>Sources of trouble with sleeping at night and any actions taken to improve the quality of sleep</h2>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">survey_source</span> <span class="op">&lt;-</span>
+<code class="sourceCode R"><span class="co"># subsetting souree variables</span>
+<span class="va">survey_source</span> <span class="op">&lt;-</span>
   <span class="va">survey_data</span> <span class="op">%&gt;%</span>
   <span class="fu">select</span><span class="op">(</span><span class="va">response_id</span>, <span class="fu">contains</span><span class="op">(</span><span class="st">'source'</span><span class="op">)</span><span class="op">)</span>
 
@@ -3023,7 +3037,8 @@ Labels:
 [14] "Thinking about the past year, what are the primary reasons you have trouble sleeping at night? \nSelect up to three. - Selected Choice Disruptive partner (e.g., someone snoring)"                                    
 [15] "Thinking about the past year, what are the primary reasons you have trouble sleeping at night? \nSelect up to three. - Selected Choice Other (please specify)"                                                        </code></pre>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">survey_source</span> <span class="op">%&gt;%</span> 
+<code class="sourceCode R"><span class="co"># plotting source variables</span>
+<span class="va">survey_source</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate_all</span><span class="op">(</span><span class="va">as_factor</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">pivot_longer</span><span class="op">(</span>cols <span class="op">=</span> <span class="op">-</span><span class="va">response_id</span>,names_to <span class="op">=</span> <span class="st">'source'</span>, values_to <span class="op">=</span> <span class="st">'response'</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">response_id</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -3036,7 +3051,8 @@ Labels:
 <h2 class="hasAnchor">
 <a href="#behavioral-questions" class="anchor"></a>Behavioral questions</h2>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">survey_behavior</span> <span class="op">&lt;-</span>
+<code class="sourceCode R"><span class="co"># subsetting behavioral questions </span>
+<span class="va">survey_behavior</span> <span class="op">&lt;-</span>
   <span class="va">survey_data</span> <span class="op">%&gt;%</span>
   <span class="fu">select</span><span class="op">(</span><span class="va">response_id</span>, <span class="fu">contains</span><span class="op">(</span><span class="st">'behavior'</span><span class="op">)</span><span class="op">)</span>
 
@@ -3074,7 +3090,8 @@ Labels:
 [27] "To what extent do you believe the steps you have taken were successful in improving your sleep in the past year? - Altered my exercise routine"                                                                                   
 [28] "To what extent do you believe the steps you have taken were successful in improving your sleep in the past year? - Not applicable, I have not taken steps to improve the quality of my sleep"                                     </code></pre>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">survey_behavior</span> <span class="op">%&gt;%</span> 
+<code class="sourceCode R"><span class="co">#plotting behavioral data</span>
+<span class="va">survey_behavior</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate_all</span><span class="op">(</span><span class="va">as_factor</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">pivot_longer</span><span class="op">(</span>cols <span class="op">=</span> <span class="op">-</span><span class="va">response_id</span>,names_to <span class="op">=</span> <span class="st">'behavior'</span>, values_to <span class="op">=</span> <span class="st">'response'</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">response_id</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -3088,7 +3105,8 @@ Labels:
 <h2 class="hasAnchor">
 <a href="#other-questions" class="anchor"></a>Other questions</h2>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">survey_other</span> <span class="op">&lt;-</span>
+<code class="sourceCode R"><span class="co"># subsetting other variables</span>
+<span class="va">survey_other</span> <span class="op">&lt;-</span>
   <span class="va">survey_data</span> <span class="op">%&gt;%</span>
   <span class="fu">select</span><span class="op">(</span><span class="va">response_id</span>, <span class="va">interst_cbt</span><span class="op">:</span><span class="va">interest_coach</span><span class="op">)</span>
 
@@ -3129,7 +3147,8 @@ Labels:
      4               Somewhat uninterested
      5                   Very uninterested</code></pre>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">survey_other</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">response_id</span><span class="op">)</span> <span class="op">%&gt;%</span> 
+<code class="sourceCode R"><span class="co"># plotting other variables</span>
+<span class="va">survey_other</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">response_id</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate_all</span><span class="op">(</span><span class="va">as_factor</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">gather</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">drop_na</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> 
@@ -3144,8 +3163,10 @@ Labels:
 <a href="#market-segmentation" class="anchor"></a>Market Segmentation</h1>
 <p>The survey collected data on almost 100 variables. It is very difficult to understand the characteristics of the potential consumers by looking at all these variables all together. Thus a dimension reduction technique is needed to visualize and capture the spread and influence of these attributes. Principal component analysis (PCA) is a widely used statistical tool for dimension reduction. We employ PCA on the survey data.</p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">2021</span><span class="op">)</span>
+<code class="sourceCode R"><span class="co"># for reproducibility of the clustering</span>
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">2021</span><span class="op">)</span>
 
+<span class="co"># creating dataset suitable for PCA</span>
 <span class="va">pca_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op">%&gt;%</span> 
   <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">response_id</span>, <span class="op">-</span><span class="va">weights</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate</span><span class="op">(</span>s_region <span class="op">=</span> <span class="fu">case_when</span><span class="op">(</span>
@@ -3157,29 +3178,36 @@ Labels:
   <span class="fu">mutate</span><span class="op">(</span><span class="fu">across</span><span class="op">(</span><span class="fu">everything</span><span class="op">(</span><span class="op">)</span>, <span class="op">~</span><span class="fu">replace_na</span><span class="op">(</span><span class="va">.x</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate_all</span><span class="op">(</span><span class="va">as_numeric</span><span class="op">)</span>
 
+<span class="co"># PCA and plotting PCA eigenvalues</span>
 <span class="va">pca</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/prcomp.html">prcomp</a></span><span class="op">(</span><span class="va">pca_data</span>, center <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>  <span class="co">#principle component analysis</span>
 <span class="fu">fviz_eig</span><span class="op">(</span><span class="va">pca</span><span class="op">)</span></code></pre></div>
 <p><img src="vignettes_files/figure-html/unnamed-chunk-22-1.png" width="768" style="display: block; margin: auto auto auto 0;"></p>
 <p>From the PCA result, it doesn’t look promising since the principal components (PC) have very little explanation power, i.e. not much dimension reduction is possible. Nevertheless, let’s take look at the first two PC.</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">autoplot</span><span class="op">(</span><span class="va">pca</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="co"># PC1 vs PC2 plot</span>
+<span class="fu">autoplot</span><span class="op">(</span><span class="va">pca</span><span class="op">)</span></code></pre></div>
 <p><img src="vignettes_files/figure-html/unnamed-chunk-23-1.png" width="768" style="display: block; margin: auto auto auto 0;"></p>
-<p>Using PC, it is hard to segment the respondents in nice separable groups. Therefore, we take help from the hierarchical cluster analysis to investigate wether we can divide the respondents based on their answers of the survey questions.</p>
+<p>A cluster analysis will allow us to segment the subjects in the survey according to their traits and responses to the survey questions. Using PC, it is hard to segment the respondents in nice separable groups. Therefore, we take help from the hierarchical cluster analysis to investigate wether we can divide the respondents based on their answers of the survey questions.</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">dist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/dist.html">dist</a></span><span class="op">(</span><span class="va">pca_data</span>, method <span class="op">=</span> <span class="st">"euclidean"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="co"># create distance matrix for hierarchical clustering</span>
+<span class="va">dist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/dist.html">dist</a></span><span class="op">(</span><span class="va">pca_data</span>, method <span class="op">=</span> <span class="st">"euclidean"</span><span class="op">)</span>
+<span class="co"># perform hierarchical clustering</span>
 <span class="va">hc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/hclust.html">hclust</a></span><span class="op">(</span><span class="va">dist</span>, method <span class="op">=</span> <span class="st">"complete"</span><span class="op">)</span>
+<span class="co"># plot dendogram</span>
 <span class="fu">fviz_dend</span><span class="op">(</span><span class="va">hc</span>, show_labels <span class="op">=</span> <span class="cn">FALSE</span>, main <span class="op">=</span> <span class="st">"Uncut Dendrogram"</span><span class="op">)</span></code></pre></div>
 <p><img src="vignettes_files/figure-html/unnamed-chunk-24-1.png" width="768" style="display: block; margin: auto auto auto 0;"></p>
 <p>From the dendogram we can decide to cut the trees at the height of 18 to get some reasonable number of clusters.</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">cluster_assign</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/cutree.html">cutree</a></span><span class="op">(</span><span class="va">hc</span>, h <span class="op">=</span> <span class="fl">18</span><span class="op">)</span>
+<code class="sourceCode R"><span class="co"># cutting the dendogram at height = 18</span>
+<span class="va">cluster_assign</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/cutree.html">cutree</a></span><span class="op">(</span><span class="va">hc</span>, h <span class="op">=</span> <span class="fl">18</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">cluster_assign</span><span class="op">)</span></code></pre></div>
 <pre><code>cluster_assign
   1   2   3   4   5   6 
 205 222 170 284   3   8 </code></pre>
 <p>Cutting the tree at 18 gives us 6 total clusters but there are few clusters with very few observation. So we reduce the number of clusters to 4.</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">fviz_dend</span><span class="op">(</span><span class="va">hc</span>, 
+<code class="sourceCode R"><span class="co"># plot the dendogram with 4 clusters</span>
+<span class="fu">fviz_dend</span><span class="op">(</span><span class="va">hc</span>, 
           k <span class="op">=</span> <span class="fl">4</span>,
           show_labels <span class="op">=</span> <span class="cn">FALSE</span>,
           rect <span class="op">=</span> <span class="cn">TRUE</span>,
@@ -3188,20 +3216,23 @@ Labels:
 <p><img src="vignettes_files/figure-html/unnamed-chunk-26-1.png" width="768" style="display: block; margin: auto auto auto 0;"></p>
 <p>Using the selected number of clusters, we proceed to the final cluster analysis using the k-means clustering with k = 4.</p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">kCluster</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/kmeans.html">kmeans</a></span><span class="op">(</span><span class="va">pca_data</span>, <span class="fl">4</span><span class="op">)</span>
+<code class="sourceCode R"><span class="co"># perform k-means clustering with k = 4</span>
+<span class="va">kCluster</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/kmeans.html">kmeans</a></span><span class="op">(</span><span class="va">pca_data</span>, <span class="fl">4</span><span class="op">)</span>
 <span class="va">pca_data</span> <span class="op">&lt;-</span> <span class="fu">mutate</span><span class="op">(</span><span class="fu">fortify</span><span class="op">(</span><span class="va">pca</span><span class="op">)</span>, col<span class="op">=</span><span class="va">kCluster</span><span class="op">$</span><span class="va">cluster</span><span class="op">)</span> 
 
+<span class="co"># plot clustering result with PCA</span>
 <span class="fu">ggplot</span><span class="op">(</span><span class="va">pca_data</span><span class="op">)</span> <span class="op">+</span>  
   <span class="fu">geom_point</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x<span class="op">=</span><span class="va">PC1</span>, y<span class="op">=</span><span class="va">PC2</span>, fill<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">col</span><span class="op">)</span><span class="op">)</span>, size<span class="op">=</span><span class="fl">3</span>, col<span class="op">=</span><span class="st">"#7f7f7f"</span>, shape<span class="op">=</span><span class="fl">21</span><span class="op">)</span> </code></pre></div>
 <p><img src="vignettes_files/figure-html/unnamed-chunk-27-1.png" width="768" style="display: block; margin: auto auto auto 0;"></p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op">%&gt;%</span> <span class="fu">mutate</span><span class="op">(</span>cluster <span class="op">=</span> <span class="va">kCluster</span><span class="op">$</span><span class="va">cluster</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="co"># attach cluster indicator to the survey data</span>
+<span class="va">survey_data</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op">%&gt;%</span> <span class="fu">mutate</span><span class="op">(</span>cluster <span class="op">=</span> <span class="va">kCluster</span><span class="op">$</span><span class="va">cluster</span><span class="op">)</span></code></pre></div>
 <p>Even with four clusters, it is visible that there are many overlapping groups of subjects. It is not expected that the cluster analysis will be able to segment the market effectively. However, we continue with these four clusters and check the demographics of these clusters.</p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">survey_demo</span> <span class="op">&lt;-</span> <span class="va">survey_data</span> <span class="op">%&gt;%</span>
   <span class="fu">select</span><span class="op">(</span><span class="va">response_id</span>, <span class="va">d_urban</span><span class="op">:</span><span class="va">s_problem</span>, <span class="va">d_marital</span><span class="op">:</span><span class="va">weights</span>, <span class="va">cluster</span><span class="op">)</span> 
 
-
+<span class="co"># summarize survey data grouped by clusters with barplots</span>
 <span class="va">survey_demo</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">weights</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">mutate_all</span><span class="op">(</span><span class="va">as_factor</span><span class="op">)</span> <span class="op">%&gt;%</span> 
   <span class="fu">pivot_longer</span><span class="op">(</span>cols <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">response_id</span>,<span class="va">cluster</span><span class="op">)</span> ,names_to <span class="op">=</span> <span class="st">'key'</span>, 
