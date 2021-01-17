@@ -67,13 +67,16 @@ This assignment is aimed at replicating a real world marketing research solution
 The experiment dataset provides 6 attributes considered in the message testing at the experiment. Let's load the data and have a glimpse at it.
 
 ```{r}
+# load the R package containing the whole analysis and dataset
 library(gradientHW)
+# overview of the experiment data
 head(experiment_data) %>% kable() %>% kable_styling()
 ```
 
 Now we explore the possible levels of the attributes.
 
 ```{r}
+# attributes and levels in experiment data
 experiment_data %>%
   select(duration:social_proof) %>%
   map(unique) %>% 
@@ -102,6 +105,7 @@ experiment_data <- experiment_data %>%
 The Radiant package allows us to estimate the `Parts-Worth' (PW) model directly. 
 
 ```{r}
+# conjoint analysis using Radiant package
 conjoint_allrespondents <- conjoint(experiment_data, rvar = "answer",  
                                     evar = names(experiment_data)[2:7]) 
 summary(conjoint_allrespondents) 
@@ -109,6 +113,7 @@ summary(conjoint_allrespondents)
 The output gives *part-worths*, *importance weights*, and *regression coefficients*. The part-worths and the regression coefficients give the same information: compared to the reference level (the first level of an attribute, the part-worths are always zero). It is easier to understand the results with the plots. Let's inspect the part-worths (the contribution of the level of the factors).
 
 ```{r, 	fig.height = 12,	fig.width = 11}
+#plotting part-worths
 plot(conjoint_allrespondents,plots = "pw")
 ```
 
@@ -124,6 +129,7 @@ Using these part-worths it is easy to construct the most desirable combination o
 In essence, the responders are more likely to download the app if combination of these messages are displayed. We can also find out which attribute has the most effect on the decision of the responders.
 
 ```{r}
+#plotting importance weights
 plot(conjoint_allrespondents,plots = "iw")
 ```
 
@@ -146,21 +152,24 @@ To understand the user group, we take the descriptive statistics route and see w
 First we load the survey data and take a glance.
 
 ```{r}
+# survey data
 head(survey_data)  %>% kable() %>% kable_styling(bootstrap_options = c("striped"), full_width = T, font_size = 11) %>%  scroll_box(height = "300px") 
 ```
 ## Demographics
 
 The variables are coded so it will be helpful to look at the variables, the levels and the coding.
 ```{r}
+# subsetting demographic variables
 survey_demo <- survey_data %>%
   select(response_id, d_urban:s_problem, d_marital:weights) 
-
+# variables and levels
 survey_demo %>%  
   select(-response_id, -weights) %>% 
   map(unique)
 ```
 It always easier to explore the data with plots and charts. From the plots below we can get an overview of the respondents; for example there are almost same number of male and female in the survey, mostly from midwest and southern region. 
 ```{r, 	fig.height = 8,	fig.width = 11}
+# barplot of the demographic variables
 survey_demo %>% select(-response_id, -weights) %>% 
   mutate_all(as_factor) %>% 
   gather() %>% 
@@ -181,16 +190,18 @@ Many other aspects were interviewed as well. The questions and the responses are
 
 
 ```{r}
+# subsetting the philosophy questions
 survey_philosophy <-
   survey_data %>%
   select(response_id, contains('m1_philosophy'))
-
+# attribtutes and levels
 survey_philosophy %>%  
   select(-response_id) %>% 
   map(unique) 
 ```
 
 ```{r}
+# plotting philosophy data
 survey_philosophy %>% select(-response_id) %>% 
   mutate_all(as_factor) %>% 
   gather() %>% 
@@ -203,10 +214,11 @@ survey_philosophy %>% select(-response_id) %>%
 
 ## Attitudes & Awareness towards statements related to sleep 
 ```{r}
+# subsetting awareness variables
 survey_awareness <-
   survey_data %>%
   select(response_id, contains('m2_awareness'))
-
+# attributes and levels
 survey_awareness %>%  
   select(-response_id) %>% 
   mutate_all(as_factor) %>%
@@ -215,6 +227,7 @@ survey_awareness %>%
 ```
 
 ```{r}
+# plotting awareness variables
 survey_awareness %>% 
   mutate_all(as_factor) %>% 
   pivot_longer(cols = -response_id,names_to = 'app', values_to = 'response') %>% 
@@ -228,6 +241,7 @@ survey_awareness %>%
 
 ## Sources of trouble with sleeping at night and any actions taken to improve the quality of sleep
 ```{r}
+# subsetting souree variables
 survey_source <-
   survey_data %>%
   select(response_id, contains('source'))
@@ -238,7 +252,9 @@ survey_source %>%
   label_to_colnames() %>% 
   names()
 ```
+
 ```{r}
+# plotting source variables
 survey_source %>% 
   mutate_all(as_factor) %>% 
   pivot_longer(cols = -response_id,names_to = 'source', values_to = 'response') %>% 
@@ -251,6 +267,7 @@ survey_source %>%
 ## Behavioral questions
 
 ```{r}
+# subsetting behavioral questions 
 survey_behavior <-
   survey_data %>%
   select(response_id, contains('behavior'))
@@ -263,6 +280,7 @@ survey_behavior %>%
 ```
 
 ```{r}
+#plotting behavioral data
 survey_behavior %>% 
   mutate_all(as_factor) %>% 
   pivot_longer(cols = -response_id,names_to = 'behavior', values_to = 'response') %>% 
@@ -276,6 +294,7 @@ survey_behavior %>%
 ## Other questions
 
 ```{r}
+# subsetting other variables
 survey_other <-
   survey_data %>%
   select(response_id, interst_cbt:interest_coach)
@@ -286,6 +305,7 @@ survey_other %>%
 ```
 
 ```{r}
+# plotting other variables
 survey_other %>% select(-response_id) %>% 
   mutate_all(as_factor) %>% 
   gather() %>% 
@@ -297,11 +317,13 @@ survey_other %>% select(-response_id) %>%
 
 # Market Segmentation
 
-The survey collected data on almost 100 variables. It is very difficult to understand the characteristics of the potential consumers by looking at all these variables all together. Thus a dimension reduction technique is needed to visualize and capture the spread and influence of these attributes. Principal component analysis (PCA) is a widely used statistical tool for dimension reduction. We employ PCA on the survey data.
+The survey collected data on almost 100 variables. It is very difficult to understand the characteristics of the potential consumers by looking at all these variables all together. Thus a dimension reduction technique is needed to visualize and capture the spread and influence of these attributes. Principal component analysis (PCA) is a widely used statistical tool for dimension reduction. We employ PCA on the survey data. 
 
 ```{r}
+# for reproducibility of the clustering
 set.seed(2021)
 
+# creating dataset suitable for PCA
 pca_data <- survey_data %>% 
   select(-response_id, -weights) %>% 
   mutate(s_region = case_when(
@@ -313,26 +335,32 @@ pca_data <- survey_data %>%
   mutate(across(everything(), ~replace_na(.x, 0))) %>% 
   mutate_all(as_numeric)
 
+# PCA and plotting PCA eigenvalues
 pca <- prcomp(pca_data, center = T)  #principle component analysis
 fviz_eig(pca)
 ```
 
 From the PCA result, it doesn't look promising since the principal components (PC) have very little explanation power, i.e. not much dimension reduction is possible. Nevertheless, let's take look at the first two PC.
 ```{r}
+# PC1 vs PC2 plot
 autoplot(pca)
 ```
 
-Using PC, it is hard to segment the respondents in nice separable groups. Therefore, we take help from the hierarchical cluster analysis to investigate wether we can divide the respondents based on their answers of the survey questions.
+A cluster analysis will allow us to segment the subjects in the survey according to their traits and responses to the survey questions. Using PC, it is hard to segment the respondents in nice separable groups. Therefore, we take help from the hierarchical cluster analysis to investigate wether we can divide the respondents based on their answers of the survey questions.
 
 ```{r}
+# create distance matrix for hierarchical clustering
 dist <- dist(pca_data, method = "euclidean")
+# perform hierarchical clustering
 hc <- hclust(dist, method = "complete")
+# plot dendogram
 fviz_dend(hc, show_labels = FALSE, main = "Uncut Dendrogram")
 ```
 
 From the dendogram we can decide to cut the trees at the height of 18 to get some reasonable number of clusters. 
 
 ```{r}
+# cutting the dendogram at height = 18
 cluster_assign <- cutree(hc, h = 18)
 table(cluster_assign)
 ```
@@ -341,6 +369,7 @@ table(cluster_assign)
 Cutting the tree at 18 gives us 6 total clusters but there are few clusters with very few observation. So we reduce the number of clusters to 4.
 
 ```{r}
+# plot the dendogram with 4 clusters
 fviz_dend(hc, 
           k = 4,
           show_labels = FALSE,
@@ -352,12 +381,15 @@ fviz_dend(hc,
 Using the selected number of clusters, we proceed to the final cluster analysis using the k-means clustering with k = 4.
 
 ```{r}
+# perform k-means clustering with k = 4
 kCluster <- kmeans(pca_data, 4)
 pca_data <- mutate(fortify(pca), col=kCluster$cluster) 
 
+# plot clustering result with PCA
 ggplot(pca_data) +  
   geom_point(aes(x=PC1, y=PC2, fill=factor(col)), size=3, col="#7f7f7f", shape=21) 
 
+# attach cluster indicator to the survey data
 survey_data <- survey_data %>% mutate(cluster = kCluster$cluster)
 ```
 Even with four clusters, it is visible that there are many overlapping groups of subjects. It is not expected that the cluster analysis will be able to segment the market effectively. However, we continue with these four clusters and check the demographics of these clusters.
@@ -366,7 +398,7 @@ Even with four clusters, it is visible that there are many overlapping groups of
 survey_demo <- survey_data %>%
   select(response_id, d_urban:s_problem, d_marital:weights, cluster) 
 
-
+# summarize survey data grouped by clusters with barplots
 survey_demo %>% select(-weights) %>% 
   mutate_all(as_factor) %>% 
   pivot_longer(cols = -c(response_id,cluster) ,names_to = 'key', 
